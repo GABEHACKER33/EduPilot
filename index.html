@@ -14,51 +14,28 @@
       align-items: center;
       padding: 20px;
     }
-    h1 {
-      color: #1e3a8a;
-    }
+    h1 { color: #1e3a8a; }
     textarea {
-      width: 90%;
-      max-width: 600px;
-      height: 100px;
-      padding: 10px;
-      font-size: 16px;
-      margin-bottom: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      resize: none;
+      width: 90%; max-width: 600px; height: 100px;
+      padding: 10px; font-size: 16px; margin-bottom: 10px;
+      border-radius: 8px; border: 1px solid #ccc; resize: none;
     }
     button {
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      background-color: #2563eb;
-      color: white;
-      cursor: pointer;
-      margin-bottom: 20px;
+      padding: 10px 20px; font-size: 16px;
+      border: none; border-radius: 8px;
+      background-color: #2563eb; color: white; cursor: pointer;
+      margin-bottom: 20px; margin-right: 10px;
     }
-    button:hover {
-      background-color: #1e40af;
-    }
+    button:hover { background-color: #1e40af; }
     #answer {
-      width: 90%;
-      max-width: 600px;
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      min-height: 150px;
+      width: 90%; max-width: 600px;
+      background: white; padding: 15px; border-radius: 8px;
+      border: 1px solid #ccc; min-height: 150px;
       white-space: pre-wrap;
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      display: flex; justify-content: center;
+      align-items: center; flex-direction: column;
     }
-    dotlottie-wc {
-      width: 150px;
-      height: 150px;
-    }
+    dotlottie-wc { width: 150px; height: 150px; }
   </style>
 </head>
 <body>
@@ -72,12 +49,22 @@
 
   <script>
     const API_URL = "https://openrouter.ai/api/v1/chat/completions";
-    const API_KEY = "sk-XXXX-YOUR-PRIVATE-KEY-HERE"; // Replace with your OpenRouter key
+    const API_KEY = "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"; // Private key
 
     function showLoading() {
       document.getElementById("answer").innerHTML = `
         <dotlottie-wc src="https://lottie.host/c731b9d7-90a1-471a-bc59-7274ad724117/a29SUAlUcj.lottie" autoplay loop></dotlottie-wc>
       `;
+    }
+
+    function extractAnswer(data) {
+      // Try multiple paths based on DeepSeek / OpenRouter response
+      return (
+        data?.completion?.content?.[0]?.text ||
+        data?.completion?.message?.content ||
+        data?.choices?.[0]?.message?.content ||
+        "No answer returned from API."
+      );
     }
 
     async function askTutor() {
@@ -102,7 +89,10 @@
         });
 
         const data = await response.json();
-        document.getElementById("answer").innerText = data.choices[0].message.content;
+        console.log(data); // check the structure
+        const content = extractAnswer(data);
+        document.getElementById("answer").innerText = content;
+
       } catch (err) {
         document.getElementById("answer").innerText = "Error: " + err.message;
       }
@@ -128,7 +118,10 @@
         });
 
         const data = await response.json();
-        document.getElementById("answer").innerText = data.choices[0].message.content;
+        console.log(data);
+        const content = extractAnswer(data);
+        document.getElementById("answer").innerText = content;
+
       } catch (err) {
         document.getElementById("answer").innerText = "Error: " + err.message;
       }
