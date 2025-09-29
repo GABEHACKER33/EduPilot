@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EduPilot - AI Personal Tutor</title>
+  <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.8.1/dist/dotlottie-wc.js" type="module"></script>
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -47,8 +48,16 @@
       padding: 15px;
       border-radius: 8px;
       border: 1px solid #ccc;
-      min-height: 100px;
+      min-height: 150px;
       white-space: pre-wrap;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    dotlottie-wc {
+      width: 150px;
+      height: 150px;
     }
   </style>
 </head>
@@ -63,51 +72,66 @@
 
   <script>
     const API_URL = "https://openrouter.ai/api/v1/chat/completions";
-    const API_KEY = "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"; // Replace with your OpenRouter key
+    const API_KEY = "sk-XXXX-YOUR-PRIVATE-KEY-HERE"; // Replace with your OpenRouter key
+
+    function showLoading() {
+      document.getElementById("answer").innerHTML = `
+        <dotlottie-wc src="https://lottie.host/c731b9d7-90a1-471a-bc59-7274ad724117/a29SUAlUcj.lottie" autoplay loop></dotlottie-wc>
+      `;
+    }
 
     async function askTutor() {
       const question = document.getElementById("question").value;
       if (!question) return alert("Type a question first!");
-      document.getElementById("answer").innerText = "Thinking... ✨";
+      showLoading();
 
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            { role: "system", content: "You are EduPilot, an AI personal tutor. Explain answers step by step in simple language." },
-            { role: "user", content: question }
-          ]
-        })
-      });
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${API_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: [
+              { role: "system", content: "You are EduPilot, an AI personal tutor. Explain answers step by step in simple language." },
+              { role: "user", content: question }
+            ]
+          })
+        });
 
-      const data = await response.json();
-      document.getElementById("answer").innerText = data.choices[0].message.content;
+        const data = await response.json();
+        document.getElementById("answer").innerText = data.choices[0].message.content;
+      } catch (err) {
+        document.getElementById("answer").innerText = "Error: " + err.message;
+      }
     }
 
     async function generatePractice() {
-      document.getElementById("answer").innerText = "Generating practice problems... ✨";
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            { role: "system", content: "You are EduPilot, an AI personal tutor. Generate 5 practice questions with step-by-step solutions." },
-            { role: "user", content: "Give 5 practice problems for students." }
-          ]
-        })
-      });
+      showLoading();
 
-      const data = await response.json();
-      document.getElementById("answer").innerText = data.choices[0].message.content;
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${API_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: [
+              { role: "system", content: "You are EduPilot, an AI personal tutor. Generate 5 practice questions with step-by-step solutions." },
+              { role: "user", content: "Give 5 practice problems for students." }
+            ]
+          })
+        });
+
+        const data = await response.json();
+        document.getElementById("answer").innerText = data.choices[0].message.content;
+      } catch (err) {
+        document.getElementById("answer").innerText = "Error: " + err.message;
+      }
     }
   </script>
 </body>
