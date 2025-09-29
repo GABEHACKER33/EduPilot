@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduPilot - AI Personal Tutor</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #1e3a8a;
+    }
+    textarea {
+      width: 90%;
+      max-width: 600px;
+      height: 100px;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: none;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background-color: #2563eb;
+      color: white;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    button:hover {
+      background-color: #1e40af;
+    }
+    #answer {
+      width: 90%;
+      max-width: 600px;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      min-height: 100px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>EduPilot 🛩️</h1>
+  <textarea id="question" placeholder="Type your question here..."></textarea>
+  <div>
+    <button onclick="askTutor()">Ask Tutor</button>
+    <button onclick="generatePractice()">Generate Practice Problems</button>
+  </div>
+  <div id="answer">Your AI answer will appear here.</div>
+
+  <script>
+    const API_URL = "https://openrouter.ai/api/v1/chat/completions";
+    const API_KEY = "sk-XXXX-YOUR-PRIVATE-KEY-HERE"; // Replace with your OpenRouter key
+
+    async function askTutor() {
+      const question = document.getElementById("question").value;
+      if (!question) return alert("Type a question first!");
+      document.getElementById("answer").innerText = "Thinking... ✨";
+
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: "You are EduPilot, an AI personal tutor. Explain answers step by step in simple language." },
+            { role: "user", content: question }
+          ]
+        })
+      });
+
+      const data = await response.json();
+      document.getElementById("answer").innerText = data.choices[0].message.content;
+    }
+
+    async function generatePractice() {
+      document.getElementById("answer").innerText = "Generating practice problems... ✨";
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: "You are EduPilot, an AI personal tutor. Generate 5 practice questions with step-by-step solutions." },
+            { role: "user", content: "Give 5 practice problems for students." }
+          ]
+        })
+      });
+
+      const data = await response.json();
+      document.getElementById("answer").innerText = data.choices[0].message.content;
+    }
+  </script>
+</body>
+</html>
